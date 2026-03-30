@@ -1,0 +1,16 @@
+[project]
+name = "article-downloader"
+version = "1.0.0"
+description = "Recursively download articles and their linked pages"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
