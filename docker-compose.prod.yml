@@ -1,0 +1,36 @@
+version: "3.9"
+
+# Production docker-compose for VPS deployment.
+# Usage: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  backend:
+    image: ghcr.io/dulap16/article-downloader/backend:latest
+    container_name: article-downloader-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DOWNLOAD_DIR=/app/downloads
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost}
+      - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-5}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30}
+    volumes:
+      - downloads:/app/downloads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: ghcr.io/dulap16/article-downloader/frontend:latest
+    container_name: article-downloader-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  downloads:
